@@ -1,16 +1,4 @@
 services:
-  postgres:
-    image: postgres:13-alpine
-    restart: unless-stopped
-    volumes:
-      - ./volumes/postgres/data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
-      - POSTGRES_USER
-    ports:
-      - 127.0.0.1:5432:5432
-    command: postgres -c log_statement=all
   mysql:
     image: mysql
     cap_add:
@@ -50,10 +38,6 @@ services:
       - DEFAULT_PHONE_REGION
       - NEXTCLOUD_ADMIN_USER
       - NEXTCLOUD_ADMIN_PASSWORD
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_HOST
       - MYSQL_HOST
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
@@ -62,6 +46,15 @@ services:
       - VERSION_NEXTCLOUD
       - AUTOINSTALL
       - XDEBUG_CONFIG
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.0.2   
+    ports:
+      - 127.0.0.1:28080:8080 
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    command: start-dev
+        
   cron:
     build:
       context: .docker/app
@@ -89,3 +82,6 @@ services:
       - 127.0.0.1:${MAILHOG_PORT}:8025
   redis:
     image: redis
+
+networks:
+  local-keycloak:
